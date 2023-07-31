@@ -199,11 +199,11 @@ def main():
             if submitted:
                 if selected_category == 'Select Category':
                     st.sidebar.warning('Please choose a category!')
-                    display_dice(game)
+                    display_dice(game,container)
                     st.stop()
                 elif game.get_scores()[selected_category] != None:
                     st.warning('Please choose a different category!')
-                    display_dice(game)
+                    display_dice(game,container)
                     st.stop()
                 else:
                     if game.max_scores[selected_category] == None:
