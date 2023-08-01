@@ -130,9 +130,17 @@ class YahtzeeGame:
 def display_dice(game, container):
     container.write("Dice Values:")
     dice_values = game.get_dice()
-
+    emoji_dict = {
+    0: '🅾️',
+    1: '1️⃣',
+    2: '2️⃣',
+    3: '3️⃣',
+    4: '4️⃣',
+    5: '5️⃣',
+    6: '6️⃣'
+    }
     # Create a list of dictionaries to represent the data for the table
-    table_data = [{"Value": value} for i, value in enumerate(dice_values)]
+    table_data = [{"Value": emoji_dict[value]} for i, value in enumerate(dice_values)]
 
     # Display the table using st.table()
     container.table(table_data)
