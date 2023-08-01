@@ -193,8 +193,9 @@ def main():
     with st.form("my_form",clear_on_submit=True):
         with st.sidebar:
             st.sidebar.subheader("Select a category:")
-            selected_category = st.sidebar.selectbox("Category", ["Select Category"] + list(game.get_scores().keys()),)
-            
+            scores = game.get_scores()
+            selected_category = st.sidebar.selectbox("Category", ["Select Category"] + [key for key, value in scores.items() if value is None],key='selectbox')
+
             submitted = st.form_submit_button("Submit", on_click=clear_multi)
             if submitted:
                 if selected_category == 'Select Category':
