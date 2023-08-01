@@ -8,12 +8,12 @@ class YahtzeeGame:
         self.rolls_left = 4
         self.selected_indices = []
         self.scores = {
-            "1": None,
-            "2": None,
-            "3": None,
-            "4": None,
-            "5": None,
-            "6": None,
+            "Ones": None,
+            "Twos": None,
+            "Threes": None,
+            "Fours": None,
+            "Fives": None,
+            "Sixes": None,
             "Three of a Kind": None,
             "Four of a Kind": None,
             "Full House": None,
@@ -23,12 +23,12 @@ class YahtzeeGame:
             "Chance": None
         }
         self.max_scores = {
-            "1": 5,
-            "2": 10,
-            "3": 15,
-            "4": 20,
-            "5": 25,
-            "6": 30,
+            "Ones": 5,
+            "Twos": 10,
+            "Threes": 15,
+            "Fours": 20,
+            "Fives": 25,
+            "Sixes": 30,
             "Three of a Kind": None,
             "Four of a Kind": None,
             "Full House": 25,
@@ -74,8 +74,10 @@ class YahtzeeGame:
 
     def calculate_score(self, category):
         dice_counts = [self.dice.count(i) for i in range(1, 7)]
-        if category in ("1", "2", "3", "4", "5", "6"):
-            score = dice_counts[int(category) - 1] * int(category)
+        dict_faces = {'Ones': 1,'Twos': 2,'Threes': 3,'Fours': 4, 'Fives': 5, 'Sixes': 6}
+        if category in dict_faces:
+            face_value = dict_faces[category]
+            score = dice_counts[face_value - 1] * face_value
         elif category == "Three of a Kind":
             if 3 in dice_counts or 4 in dice_counts or 5 in dice_counts:
                 score = sum(self.dice)
