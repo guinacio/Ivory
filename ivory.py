@@ -77,12 +77,12 @@ class YahtzeeGame:
         if category in ("1", "2", "3", "4", "5", "6"):
             score = dice_counts[int(category) - 1] * int(category)
         elif category == "Three of a Kind":
-            if 3 in dice_counts:
+            if 3 in dice_counts or 4 in dice_counts or 5 in dice_counts:
                 score = sum(self.dice)
             else:
                 score = 0
         elif category == "Four of a Kind":
-            if 4 in dice_counts:
+            if 4 in dice_counts or 5 in dice_counts:
                 score = sum(self.dice)
             else:
                 score = 0
@@ -92,7 +92,7 @@ class YahtzeeGame:
             else:
                 score = 0
         elif category == "Small Straight":
-            if 1 in dice_counts[1:5] or 1 in dice_counts[2:6]:
+            if dice_counts == [0, 1, 1, 1, 1, 1] or dice_counts == [1, 1, 1, 1, 1, 0]:
                 score = 30
             else:
                 score = 0
