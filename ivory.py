@@ -6,6 +6,7 @@ class YahtzeeGame:
     def __init__(self):
         self.dice = [0] * 5
         self.rolls_left = 4
+        self.turns_left = 13
         self.selected_indices = []
         self.scores = {
             "Ones": None,
@@ -51,6 +52,7 @@ class YahtzeeGame:
             st.warning("You have no rolls left! Please choose a category to compute your points.")
     
     def new_turn(self):
+        self.turns_left -= 1
         self.rolls_left = 4
         self.selected_indices = []
         self.roll_dice()
@@ -128,7 +130,6 @@ class YahtzeeGame:
         return total
 
 def display_dice(game, container):
-    container.write("Dice Values:")
     dice_values = game.get_dice()
     emoji_dict = {
     0: '🅾️',
@@ -140,7 +141,7 @@ def display_dice(game, container):
     6: '6️⃣'
     }
     # Create a list of dictionaries to represent the data for the table
-    table_data = [{"Value": emoji_dict[value]} for i, value in enumerate(dice_values)]
+    table_data = [{"Dice Values": emoji_dict[value]} for i, value in enumerate(dice_values)]
 
     # Display the table using st.table()
     container.table(table_data)
@@ -169,6 +170,38 @@ def display_score_summary(game, container):
     container.table(table_data)
 
     st.sidebar.write("**Total Score:**", game.get_total_score())
+
+def show_help():
+    st.subheader("Ivory Rules")
+    st.write("Ivory is a dice game based on the popular Yahtzee game that involves rolling five dice in order to achieve specific combinations "
+             "and score points. The game consists of 13 rounds, and the player should aim to achieve the highest total score at the "
+             "end of all rounds. Here are the rules:")
+
+    st.write("**1. Roll the Dice:**")
+    st.write("   - At the beginning of each round, you get a roll of five dice.")
+    st.write("   - You can choose to keep any number of dice and re-roll the others.")
+    st.write("   - You can re-roll up to three more times during your turn.")
+
+    st.write("**2. Scoring:**")
+    st.write("   - Each round, you must choose a scoring category for your roll.")
+    st.write("   - The categories include ones, twos, threes, fours, fives, sixes, three of a kind, four of a kind, "
+             "full house, small straight, large straight, Ivory, and chance.")
+    st.write("   - Once you've chosen a category, you cannot change it for the rest of the game.")
+    st.write("   - If your roll meets the requirements of the selected category, you score points based on the "
+             "combination achieved.")
+
+    st.write("**3. Scoring Categories:**")
+    st.write("   - **Ones, Twos, Threes, Fours, Fives, Sixes:** Sum of all dice that show the corresponding number.")
+    st.write("   - **Three of a Kind:** Sum of all dice if there are at least three dice with the same number.")
+    st.write("   - **Four of a Kind:** Sum of all dice if there are at least four dice with the same number.")
+    st.write("   - **Full House:** 25 points if you have three dice of one number and two dice of another number.")
+    st.write("   - **Small Straight:** 30 points if you have the sequence 1, 2, 3, 4, 5 (1-5).")
+    st.write("   - **Large Straight:** 40 points if you have the sequence 2, 3, 4, 5, 6 (2-6).")
+    st.write("   - **Ivory:** 50 points if you have all five dice showing the same number.")
+    st.write("   - **Chance:** Sum of all dice, regardless of the combination.")
+
+    st.write("**4. End of the Game:**")
+    st.write("   - After 13 rounds, the game ends, aim to achieve the highest score and break your own record!")
 
 def main():
     st.set_page_config(
@@ -224,12 +257,20 @@ def main():
         if submitted:
             display_score_summary(game,col2)
             game.new_turn()
+            if game.turns_left == 0:
+                col1.success(f'The End! Your final score is: {game.get_total_score()}')
+                col1.balloons()
+                st.stop()
         else:
             display_score_summary(game,col2)
 
     display_dice(game, container)
     if game.get_rolls_left() != 4:
         container.success(f"Rolls Left: **{game.get_rolls_left()}**")
+    
+    if st.sidebar.button("Show Rules"):
+        show_help()
+        
 
 if __name__ == "__main__":
     main()
