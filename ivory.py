@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 import random
 from PIL import Image
 
@@ -167,7 +168,19 @@ def display_score_summary(game, container):
         table_data.append({"Category": category, "Score": score, "Max Score": max_score})
 
     # Display the table using st.table()
-    container.table(table_data)
+    df = pd.DataFrame(table_data)
+
+    container.dataframe(df,hide_index=True, use_container_width=True, height=493,
+        column_config={
+        "Category": st.column_config.TextColumn(
+            "Category",
+            help="🎲 Score Categories, click 'Show Rules' to view the rules."
+        ),
+        "Max Score": st.column_config.TextColumn(
+            "Max Score",
+            help="🎲 Max Scores for your game, the highest score possible is 340 🥇."
+        )
+        })
 
     st.sidebar.write("**Total Score:**", game.get_total_score())
 
@@ -258,7 +271,7 @@ def main():
             display_score_summary(game,col2)
             game.new_turn()
             if game.turns_left == 0:
-                col1.success(f'The End! Your final score is: {game.get_total_score()}')
+                col1.success(f'The End! Your final score is: **{game.get_total_score()}**')
                 col1.balloons()
                 st.stop()
         else:
