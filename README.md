@@ -45,8 +45,8 @@ This game is still in development. You are welcome to contribute, report bugs, o
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/guinacio/ivory.git
-cd ivory
+git clone https://github.com/guinacio/Ivory.git
+cd Ivory
 ```
 
 2. Install the required dependencies:
