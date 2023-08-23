@@ -141,10 +141,9 @@ def display_dice(game, container):
     5: '5️⃣',
     6: '6️⃣'
     }
-    # Create a list of dictionaries to represent the data for the table
+
     table_data = [{"Dice Values": emoji_dict[value]} for i, value in enumerate(dice_values)]
 
-    # Display the table using st.table()
     container.table(table_data)
 
 def clear_multi():
@@ -155,7 +154,6 @@ def display_score_summary(game, container):
     container.subheader("Score Summary")
     scores = game.get_scores()
 
-    # Create a list of dictionaries to represent the data for the table
     table_data = []
     for category, score in scores.items():
         if score is None:
@@ -167,7 +165,6 @@ def display_score_summary(game, container):
 
         table_data.append({"Category": category, "Score": score, "Max Score": max_score})
 
-    # Display the table using st.table()
     df = pd.DataFrame(table_data)
 
     container.dataframe(df,hide_index=True, use_container_width=True, height=493,
@@ -224,8 +221,6 @@ def main():
         initial_sidebar_state="expanded",
     )
     
-    #image = Image.open('ivory_logo.jpeg')
-    #st.sidebar.image(image)
     st.sidebar.title("🎲 Ivory",help='Dice game. Have fun!')
 
     if 'game' not in st.session_state:
@@ -239,49 +234,52 @@ def main():
     if st.sidebar.button("Roll Dice",use_container_width=True):
         game.roll_dice()
     
-    col1, col2 = st.columns(2)
+    tabGame, tabRules = st.tabs(["🎮 Game", "📝 Rules"])
 
-    col1.header('Dice')
-    container = col1.container()
-    if game.get_rolls_left() == 4:
-        col1.warning('Click "Roll Dice" to start playing.')
+    with tabGame:
+        col1, col2 = st.columns(2)
 
-    with st.form("my_form",clear_on_submit=True):
-        with st.sidebar:
-            st.sidebar.subheader("Select a category:")
-            scores = game.get_scores()
-            selected_category = st.sidebar.selectbox("Category", ["Select Category"] + [key for key, value in scores.items() if value is None],key='selectbox')
+        col1.header('Dice')
+        container = col1.container()
+        if game.get_rolls_left() == 4:
+            col1.warning('Click "Roll Dice" to start playing.')
 
-            submitted = st.form_submit_button("Submit", on_click=clear_multi)
+        with st.form("my_form",clear_on_submit=True):
+            with st.sidebar:
+                st.sidebar.subheader("Select a category:")
+                scores = game.get_scores()
+                selected_category = st.sidebar.selectbox("Category", ["Select Category"] + [key for key, value in scores.items() if value is None],key='selectbox')
+
+                submitted = st.form_submit_button("Submit", on_click=clear_multi)
+                if submitted:
+                    if selected_category == 'Select Category':
+                        st.sidebar.warning('Please choose a category!')
+                        display_dice(game,container)
+                        st.stop()
+                    elif game.get_scores()[selected_category] != None:
+                        st.warning('Please choose a different category!')
+                        display_dice(game,container)
+                        st.stop()
+                    else:
+                        if game.max_scores[selected_category] == None:
+                            game.max_scores[selected_category] = sum(game.get_dice())
+                        game.calculate_score(selected_category)
+                        st.success(f"Your score for {selected_category}: **{game.get_scores()[selected_category]}**")
             if submitted:
-                if selected_category == 'Select Category':
-                    st.sidebar.warning('Please choose a category!')
-                    display_dice(game,container)
+                display_score_summary(game,col2)
+                game.new_turn()
+                if game.turns_left == 0:
+                    col1.success(f'The End! Your final score is: **{game.get_total_score()}**')
+                    col1.balloons()
                     st.stop()
-                elif game.get_scores()[selected_category] != None:
-                    st.warning('Please choose a different category!')
-                    display_dice(game,container)
-                    st.stop()
-                else:
-                    if game.max_scores[selected_category] == None:
-                        game.max_scores[selected_category] = sum(game.get_dice())
-                    game.calculate_score(selected_category)
-                    st.success(f"Your score for {selected_category}: **{game.get_scores()[selected_category]}**")
-        if submitted:
-            display_score_summary(game,col2)
-            game.new_turn()
-            if game.turns_left == 0:
-                col1.success(f'The End! Your final score is: **{game.get_total_score()}**')
-                col1.balloons()
-                st.stop()
-        else:
-            display_score_summary(game,col2)
+            else:
+                display_score_summary(game,col2)
 
-    display_dice(game, container)
-    if game.get_rolls_left() != 4:
-        container.success(f"Rolls Left: **{game.get_rolls_left()}**")
+        display_dice(game, container)
+        if game.get_rolls_left() != 4:
+            container.success(f"Rolls Left: **{game.get_rolls_left()}**")
     
-    if st.sidebar.button("Show Rules"):
+    with tabRules:
         show_help()
         
 
