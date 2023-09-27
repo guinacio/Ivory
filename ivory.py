@@ -241,9 +241,6 @@ def main():
 
     selected_dice = st.sidebar.multiselect('Select Dice to Reroll:', options=list(game.dice_label.values()),default=None,help='You can select specific dice to reroll. Use the index of the dice to choose.',key='multiselect')
     game.selected_indices = [label_to_index[label] for label in selected_dice]
-
-    if st.sidebar.button("Roll Dice",use_container_width=True):
-        game.roll_dice()
     
     tabGame, tabRules = st.tabs(["🎮 Game", "📝 Rules"])
 
@@ -252,6 +249,11 @@ def main():
 
         col1.header('Dice')
         container = col1.container()
+
+        if st.sidebar.button("Roll Dice",use_container_width=True):
+            with container:
+                game.roll_dice()
+
         if game.get_rolls_left() == 4:
             col1.warning('Click "Roll Dice" to start playing.')
 
