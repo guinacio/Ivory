@@ -39,6 +39,13 @@ class YahtzeeGame:
             "Ivory": 50,
             "Chance": None
         }
+        self.dice_label = {
+            0:'A',
+            1:'B',
+            2:'C',
+            3:'D',
+            4:'E'
+        }
 
     def roll_dice(self):
         if self.rolls_left > 0:
@@ -142,9 +149,10 @@ def display_dice(game, container):
     6: '6️⃣'
     }
 
-    table_data = [{"Dice Values": emoji_dict[value]} for i, value in enumerate(dice_values)]
+    table_data = [{"Index": game.dice_label[i],"Dice Values": emoji_dict[value]} for i, value in enumerate(dice_values)]
 
-    container.table(table_data)
+    table_df = pd.DataFrame(table_data)
+    container.dataframe(table_df,hide_index=True)
 
 def clear_multi():
     st.session_state.multiselect = []
@@ -178,7 +186,8 @@ def display_score_summary(game, container):
             help="🎲 Max Scores for your game, the highest score possible is 340 🥇."
         )
         })
-
+    with container:
+        st.write("**Total Score:**", game.get_total_score())
     st.sidebar.write("**Total Score:**", game.get_total_score())
 
 def show_help():
@@ -228,8 +237,10 @@ def main():
 
     game = st.session_state.game
 
-    selected_dice = st.sidebar.multiselect('Select Dice to Reroll:', options=[f'{i}' for i in range(5)],default=None,help='You can select specific dice to reroll. Use the index of the dice to choose.',key='multiselect')
-    game.selected_indices = list(map(int, selected_dice))
+    label_to_index = {label: index for index, label in game.dice_label.items()}
+
+    selected_dice = st.sidebar.multiselect('Select Dice to Reroll:', options=list(game.dice_label.values()),default=None,help='You can select specific dice to reroll. Use the index of the dice to choose.',key='multiselect')
+    game.selected_indices = [label_to_index[label] for label in selected_dice]
 
     if st.sidebar.button("Roll Dice",use_container_width=True):
         game.roll_dice()
