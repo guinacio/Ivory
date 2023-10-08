@@ -2,6 +2,25 @@ import streamlit as st
 import pandas as pd
 import random
 from PIL import Image
+from datetime import datetime
+import time
+
+def initialize_scores():
+    if 'scores' not in st.session_state:
+        st.session_state['scores'] = {}
+    return st.session_state['scores']
+
+def update_leaderboard(user_scores, game_time, score):
+    user_scores[game_time] = score
+
+def show_leaderboard(user_scores,tabLeaderboard):
+    with tabLeaderboard:
+        if not user_scores:
+            st.warning('No user scores at the moment.')
+        else:
+            sorted_scores = sorted(user_scores.items(), key=lambda x: x[1], reverse=True)
+            for i, (user, user_score) in enumerate(sorted_scores, start=1):
+                st.write(f"**{i}. {user}**: <code style='color: rgb(9, 171, 59); background: rgb(248, 249, 251); font-family: \"Source Code Pro\", monospace;'>{user_score}</code> points", unsafe_allow_html=True)
 
 class YahtzeeGame:
     def __init__(self):
@@ -235,6 +254,7 @@ def main():
     if 'game' not in st.session_state:
         st.session_state.game = YahtzeeGame()
 
+    user_scores = initialize_scores()
     game = st.session_state.game
 
     label_to_index = {label: index for index, label in game.dice_label.items()}
@@ -242,7 +262,7 @@ def main():
     selected_dice = st.sidebar.multiselect('Select Dice to Reroll:', options=list(game.dice_label.values()),default=None,help='You can select specific dice to reroll. Use the index of the dice to choose.',key='multiselect')
     game.selected_indices = [label_to_index[label] for label in selected_dice]
     
-    tabGame, tabRules = st.tabs(["🎮 Game", "📝 Rules"])
+    tabGame, tabRules, tabLeaderbord = st.tabs(["🎮 Game", "📝 Rules", '🎖️ Leaderboard'])
 
     with tabGame:
         col1, col2 = st.columns(2)
@@ -284,7 +304,17 @@ def main():
                 if game.turns_left == 0:
                     col1.success(f'The End! Your final score is: **{game.get_total_score()}**')
                     col1.balloons()
-                    st.stop()
+                    now = datetime.now()
+                    time.sleep(3)
+                    game_time = now.strftime("%d/%m/%y %H:%M") 
+                    score = game.get_total_score()
+                    update_leaderboard(user_scores, game_time, score)
+                    show_leaderboard(user_scores,tabLeaderbord)
+                    col1.success(f'Your final score of: **{game.get_total_score()}** was added to the leaderboard!')
+                    time.sleep(2)
+                    st.session_state.game = YahtzeeGame()
+                    game = st.session_state.game
+                    st.rerun()
             else:
                 display_score_summary(game,col2)
 
@@ -294,7 +324,8 @@ def main():
     
     with tabRules:
         show_help()
-        
 
+    show_leaderboard(user_scores,tabLeaderbord)
+        
 if __name__ == "__main__":
     main()
