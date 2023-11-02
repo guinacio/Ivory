@@ -5,6 +5,7 @@ from PIL import Image
 from datetime import datetime
 import time
 
+@st.cache_resource
 def initialize_scores():
     if 'scores' not in st.session_state:
         st.session_state['scores'] = {}
@@ -277,7 +278,7 @@ def main():
         if game.get_rolls_left() == 4:
             col1.warning('Click "Roll Dice" to start playing.')
 
-        with st.form("my_form",clear_on_submit=True):
+        with st.form("form_turn",clear_on_submit=True):
             with st.sidebar:
                 st.sidebar.subheader("Select a category:")
                 scores = game.get_scores()
@@ -301,27 +302,33 @@ def main():
             if submitted:
                 display_score_summary(game,col2)
                 game.new_turn()
-                if game.turns_left == 0:
-                    col1.success(f'The End! Your final score is: **{game.get_total_score()}**')
-                    col1.balloons()
-                    now = datetime.now()
-                    time.sleep(3)
-                    game_time = now.strftime("%d/%m/%y %H:%M") 
-                    score = game.get_total_score()
-                    update_leaderboard(user_scores, game_time, score)
-                    show_leaderboard(user_scores,tabLeaderbord)
-                    col1.success(f'Your final score of: **{game.get_total_score()}** was added to the leaderboard!')
-                    time.sleep(2)
-                    st.session_state.game = YahtzeeGame()
-                    game = st.session_state.game
-                    st.rerun()
             else:
                 display_score_summary(game,col2)
 
         display_dice(game, container)
         if game.get_rolls_left() != 4:
             container.success(f"Rolls Left: **{game.get_rolls_left()}**")
-    
+
+        if game.turns_left == 0:
+            col1.success(f'The End! Your final score is: **{game.get_total_score()}**')
+            col1.balloons()
+            now = datetime.now()
+            time.sleep(3)
+            with col1.form("form_leaderboard"):
+                player_name = st.text_input('Write a nickname:', 'Player 1')
+                score = game.get_total_score()
+                submitted = st.form_submit_button("Submit")
+                if submitted: 
+                    game_time = now.strftime("%d/%m/%y %H:%M")
+                    game_id = player_name + ' - ' + game_time
+                    update_leaderboard(user_scores, game_id, score)
+                    show_leaderboard(user_scores,tabLeaderbord)
+                    col1.success(f'Your final score of: **{game.get_total_score()}** was added to the leaderboard!')
+                    time.sleep(2)
+                    st.session_state.game = YahtzeeGame()
+                    game = st.session_state.game
+                    st.rerun()
+                    
     with tabRules:
         show_help()
 
