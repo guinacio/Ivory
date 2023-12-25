@@ -5,14 +5,25 @@ from PIL import Image
 from datetime import datetime
 import time
 
+scoreboard_path = 'initial_scoreboard.txt'
+
 @st.cache_resource
 def initialize_scores():
     if 'scores' not in st.session_state:
         st.session_state['scores'] = {}
+
+        with open(scoreboard_path, 'r') as file:
+            for line in file:
+                columns = line.strip().split()
+                player_name, score, date, time = columns
+                game_time_str = f'{date} {time}'
+                game_time = datetime.strptime(game_time_str, "%d/%m/%Y %H:%M")
+                game_id = f'{player_name} - {game_time.strftime("%d/%m/%y %H:%M")}'
+                st.session_state['scores'][game_id] = int(score)
     return st.session_state['scores']
 
-def update_leaderboard(user_scores, game_time, score):
-    user_scores[game_time] = score
+def update_leaderboard(user_scores, game_id, score):
+    user_scores[game_id] = score
 
 def show_leaderboard(user_scores,tabLeaderboard):
     with tabLeaderboard:
