@@ -36,7 +36,7 @@
 
 You can play the game by visiting [Ivory](https://ivorydice.streamlit.app).
 
-![Current Inteface](https://github.com/guinacio/ivory/assets/2325925/d0ef851c-61d4-494a-b4ea-1d8dca4dacbf)
+![Current Inteface](https://github.com/guinacio/Ivory/assets/2325925/7238a331-b898-4d40-bbcf-62af361ef84f)
 
 ## Development
 
