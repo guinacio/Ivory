@@ -170,20 +170,25 @@ class YahtzeeGame:
 
 def display_dice(game, container):
     dice_values = game.get_dice()
-    emoji_dict = {
-    0: '🅾️',
-    1: '1️⃣',
-    2: '2️⃣',
-    3: '3️⃣',
-    4: '4️⃣',
-    5: '5️⃣',
-    6: '6️⃣'
+
+    image_dict = {
+    0: 'https://github.com/guinacio/Ivory/blob/master/image0.png?raw=true',
+    1: 'https://github.com/guinacio/Ivory/blob/master/image1.png?raw=true',
+    2: 'https://github.com/guinacio/Ivory/blob/master/image2.png?raw=true',
+    3: 'https://github.com/guinacio/Ivory/blob/master/image3.png?raw=true',
+    4: 'https://github.com/guinacio/Ivory/blob/master/image4.png?raw=true',
+    5: 'https://github.com/guinacio/Ivory/blob/master/image5.png?raw=true',
+    6: 'https://github.com/guinacio/Ivory/blob/master/image6.png?raw=true'
     }
 
-    table_data = [{"Index": game.dice_label[i],"Dice Values": emoji_dict[value]} for i, value in enumerate(dice_values)]
+    table_data = [{"Index": game.dice_label[i],"Dice Values": image_dict[value]} for i, value in enumerate(dice_values)]
 
     table_df = pd.DataFrame(table_data)
-    container.dataframe(table_df,hide_index=True)
+    container.dataframe(table_df,column_config={
+        "Dice Values": st.column_config.ImageColumn(
+            "Dice Values", help="Dice face rolled"
+        )
+    },hide_index=True)
 
 def clear_multi():
     st.session_state.multiselect = []
