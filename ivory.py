@@ -188,7 +188,7 @@ def display_dice(game, container):
         "Dice Values": st.column_config.ImageColumn(
             "Dice Values", help="Dice face rolled"
         )
-    },hide_index=True)
+    }, height=438, hide_index=True, row_height=80)
 
 def clear_multi():
     st.session_state.multiselect = []
